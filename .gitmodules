@@ -1,0 +1,3 @@
+[submodule "sha1_hash_cracker"]
+	path = sha1_hash_cracker
+	url = https://github.com/JJSimo/sha1_hash_cracker
