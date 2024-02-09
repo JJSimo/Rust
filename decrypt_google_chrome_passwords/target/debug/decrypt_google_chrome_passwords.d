@@ -1,0 +1,1 @@
+C:\Users\simone-jj\Documents\Code\Rust\decrypt_google_chrome_passwords\target\debug\decrypt_google_chrome_passwords.exe: C:\Users\simone-jj\Documents\Code\Rust\decrypt_google_chrome_passwords\src\main.rs
