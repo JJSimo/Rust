@@ -10,8 +10,6 @@ use regex::Regex;
 fn get_chrome_local_pass_path() -> PathBuf{
     let userprofile = env::var("USERPROFILE").unwrap_or_else(|_| String::from("."));                                        // Get the USERPROFILE environment variable
     let local_pass_path = PathBuf::from(format!(r"{}\AppData\Local\Google\Chrome\User Data\Local State", userprofile));     // Construct the path
-    // Normalize the path
-    //let normalized_path = local_pass_path.canonicalize().expect("Failed to canonicalize path");
     return local_pass_path;
 }
 
@@ -43,11 +41,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let local_pass_path_file = File::open(get_chrome_local_pass_path())?;               // open file from command line arguments            
     let encrypted_key = extract_encrypted_key(local_pass_path_file)
-        .unwrap_or_else(|err| {
-            eprintln!("Error: {}", err);
-            "".to_string()  // Ritorna una stringa vuota se c'è un errore
-        });
+        .unwrap_or_default();  // Utilizza una stringa vuota se c'è un errore
     println!("Encrypted key: {}", encrypted_key);
+
 
     Ok(())
 }
