@@ -15,6 +15,30 @@ check_command() {
   fi
 }
 
+# Check if VirtualBox is installed
+if ! command -v vboxmanage &> /dev/null; then
+  echo "[*] VirtualBox is not installed. Installing VirtualBox..."
+  
+  # Install VirtualBox based on the system package manager
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    if [[ $NAME == "Ubuntu" || $NAME == "Debian" ]]; then
+      sudo apt update
+      sudo apt install -y virtualbox
+      check_command "VirtualBox installation failed"
+    elif [[ $NAME == "openSUSE" || $NAME == "SUSE Linux Enterprise" ]]; then
+      sudo zypper install -y virtualbox
+      check_command "VirtualBox installation failed"
+    else
+      echo "[!] Unsupported OS for automatic installation."
+      exit 1
+    fi
+  else
+    echo "[!] Could not detect the operating system."
+    exit 1
+  fi
+fi
+
 # Download Ubuntu ISO
 mkdir -p "$DOWNLOAD_DIR"
 cd "$DOWNLOAD_DIR"
