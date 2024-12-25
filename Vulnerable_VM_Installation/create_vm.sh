@@ -33,7 +33,7 @@ print_message() {
 download_virtual_box() {
   if ! command -v vboxmanage &> /dev/null; then
     print_message "red" "VirtualBox is not installed."
-    print_message "green" "Installing VirtualBox..."
+    print_message "green" "Installing VirtualBox"
     
     # Install VirtualBox based on the system package manager
     if [ -f /etc/os-release ]; then
@@ -65,7 +65,7 @@ download_iso_ubuntu(){
   cd "$DOWNLOAD_DIR"
 
   if [ ! -f "$ISO_NAME" ]; then
-    print_message "green" "Downloading Ubuntu 20.04 ISO..."
+    print_message "green" "Downloading Ubuntu 20.04 ISO"
     wget -c "$ISO_URL"
     check_command "Error during ISO downloading"
   else
@@ -79,12 +79,12 @@ setup_vm() {
     print_message "green" "Virtual machine '$VM_NAME' already exists. Skipping creation."
   else
     # Create the virtual machine in VirtualBox
-    print_message "green" "Creating the virtual machine..."
+    print_message "green" "Creating the virtual machine"
     vboxmanage createvm --name "$VM_NAME" --ostype Ubuntu_64 --register
     check_command "VM creation failed."
 
     # Configure the virtual machine
-    print_message "green" "Setting up the virtual machine..."
+    print_message "green" "Setting up the virtual machine"
     vboxmanage modifyvm "$VM_NAME" \
       --memory 8192 \
       --cpus 6 \
@@ -114,9 +114,40 @@ setup_vm() {
   fi
 }
 
+# Attach the correct version of Guest Additions ISO
+get_guest_additions_iso() {
+  # Get the VirtualBox version
+  local vb_version
+  vb_version=$(vboxmanage --version | cut -d 'r' -f 1)
+  check_command "Failed to retrieve VirtualBox version."
+
+  # Set download URL
+  local iso_name="VBoxGuestAdditions_$vb_version.iso"
+  local iso_url="https://download.virtualbox.org/virtualbox/$vb_version/$iso_name"
+  local iso_path="$DOWNLOAD_DIR/$iso_name"
+
+  # Check if ISO is already downloaded
+  if [ ! -f "$iso_path" ]; then
+    print_message "green" "Downloading Guest Additions ISO for VirtualBox $vb_version"
+    wget -O "$iso_path" "$iso_url"
+    check_command "Failed to download Guest Additions ISO."
+  else
+    print_message "green" "Guest Additions ISO already downloaded: $iso_path"
+  fi
+
+  # Attach the ISO to the VM
+  print_message "green" "Attaching Guest Additions ISO"
+  vboxmanage storageattach "$VM_NAME" \
+    --storagectl "IDE Controller" \
+    --port 1 --device 0 \
+    --type dvddrive \
+    --medium "$iso_path"
+  check_command "Failed to attach Guest Additions ISO."
+}
+
 # Start the VM
 start_vm(){
-  print_message "green" "Starting the virtual machine..."
+  print_message "green" "Starting the virtual machine"
   vboxmanage startvm "$VM_NAME" --type gui
   check_command "VM start failed."
 
@@ -128,3 +159,4 @@ download_virtual_box
 download_iso_ubuntu
 setup_vm
 start_vm
+get_guest_additions_iso
