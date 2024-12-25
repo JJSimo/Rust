@@ -118,7 +118,7 @@ setup_vm() {
 get_guest_additions_iso() {
   # Get the VirtualBox version
   local vb_version
-  vb_version=$(vboxmanage --version | cut -d 'r' -f 1)
+  vb_version=$(vboxmanage --version | cut -d '_' -f 1)
   check_command "Failed to retrieve VirtualBox version."
 
   # Set download URL
@@ -146,17 +146,24 @@ get_guest_additions_iso() {
 }
 
 # Start the VM
-start_vm(){
-  print_message "green" "Starting the virtual machine"
-  vboxmanage startvm "$VM_NAME" --type gui
-  check_command "VM start failed."
+start_vm() {
+  echo ""
+  read -p "[?] Do you want to start the virtual machine now? (Y/n): " user_input
+  if [[ "$user_input" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    print_message "green" "Starting the virtual machine"
+    vboxmanage startvm "$VM_NAME" --type gui
+    check_command "VM start failed."
 
-  print_message "green" "Virtual machine created and started successfully!"
+    print_message "green" "Virtual machine started successfully!"
+  else
+    print_message "green" "Virtual machine setup complete. You can start it manually later."
+  fi
 }
+
 
 # ---------------------------------------------------------------------------------------------------------
 download_virtual_box
 download_iso_ubuntu
 setup_vm
-start_vm
 get_guest_additions_iso
+start_vm
