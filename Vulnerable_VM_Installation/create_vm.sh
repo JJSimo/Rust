@@ -42,7 +42,9 @@ download_virtual_box() {
         sudo apt update
         sudo apt install -y virtualbox
         check_command "VirtualBox installation failed"
-      elif [[ $NAME == "openSUSE" || $NAME == "SUSE Linux Enterprise" ]]; then
+        
+      # check if os starts with openSUSE
+      elif [[ $NAME =~ "openSUSE" || $NAME == "SUSE Linux Enterprise" ]]; then
         sudo zypper install -y virtualbox
         check_command "VirtualBox installation failed"
       else
