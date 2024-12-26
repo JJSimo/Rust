@@ -12,5 +12,9 @@ After installing Ubuntu in the virtual machine:
 - mount the guest additions
 - open it in the terminal and type `sudo ./VBoxLinuxAdditions.run`
 
+> [!WARNING]
+> OSs supported by the `create_vm.sh` script are Ubuntu like distros and openSUSE.
+> If you want to add your OS, edit the `download_virtual_box` function and add the corresponding `elif then` block 😊
+
 ## Setting up environment
 Each folder contains the script to set up the virtual machine in order to exploit the vulnerability and the PoC written in Rust. 

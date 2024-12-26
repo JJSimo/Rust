@@ -49,6 +49,9 @@ download_virtual_box() {
         sudo zypper install -y virtualbox
         check_command "VirtualBox installation failed"
         VBOXMANAGE="VBoxManage"
+
+      # add your OS here
+      
       else
         print_message "red" "Unsupported OS for automatic installation."
         exit 1
