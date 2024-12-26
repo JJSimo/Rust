@@ -29,6 +29,18 @@ print_message() {
   fi
 }
 
+# Detect the correct VBoxManage command
+detect_vboxmanage_command() {
+  if command -v vboxmanage &> /dev/null; then
+    VBOXMANAGE="vboxmanage"
+  elif command -v VBoxManage &> /dev/null; then
+    VBOXMANAGE="VBoxManage"
+  else
+    print_message "red" "VBoxManage command not found."
+    exit 1
+  fi
+}
+
 # Check if VirtualBox is installed and if not install it
 download_virtual_box() {
   if ! command -v vboxmanage &> /dev/null; then
@@ -169,6 +181,7 @@ start_vm() {
 
 
 # ---------------------------------------------------------------------------------------------------------
+detect_vboxmanage_command
 download_virtual_box
 download_iso_ubuntu
 setup_vm
