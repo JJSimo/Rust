@@ -42,11 +42,13 @@ download_virtual_box() {
         sudo apt update
         sudo apt install -y virtualbox
         check_command "VirtualBox installation failed"
-        
+        VBOXMANAGE="vboxmanage"
+
       # check if os starts with openSUSE
       elif [[ $NAME =~ "openSUSE" || $NAME == "SUSE Linux Enterprise" ]]; then
         sudo zypper install -y virtualbox
         check_command "VirtualBox installation failed"
+        VBOXMANAGE="VBoxManage"
       else
         print_message "red" "Unsupported OS for automatic installation."
         exit 1
@@ -77,17 +79,17 @@ download_iso_ubuntu(){
 
 # Install virtual box and create the virtual machine
 setup_vm() {
-  if vboxmanage list vms | grep -q "\"$VM_NAME\""; then
+  if $VBOXMANAGE list vms | grep -q "\"$VM_NAME\""; then
     print_message "green" "Virtual machine '$VM_NAME' already exists. Skipping creation."
   else
     # Create the virtual machine in VirtualBox
     print_message "green" "Creating the virtual machine"
-    vboxmanage createvm --name "$VM_NAME" --ostype Ubuntu_64 --register
+    $VBOXMANAGE createvm --name "$VM_NAME" --ostype Ubuntu_64 --register
     check_command "VM creation failed."
 
     # Configure the virtual machine
     print_message "green" "Setting up the virtual machine"
-    vboxmanage modifyvm "$VM_NAME" \
+    $VBOXMANAGE modifyvm "$VM_NAME" \
       --memory 8192 \
       --cpus 6 \
       --nic1 nat \
@@ -102,16 +104,16 @@ setup_vm() {
 
     # Create a virtual disk
     print_message "green" "Creating virtual disk (60 GB)"
-    vboxmanage createhd --filename "$VM_DIR/$VM_NAME.vdi" --size 61440
+    $VBOXMANAGE createhd --filename "$VM_DIR/$VM_NAME.vdi" --size 61440
     check_command "Virtual disk creation failed."
 
     # Attach the disk and ISO file
-    vboxmanage storagectl "$VM_NAME" --name "SATA Controller" --add sata --controller IntelAhci
-    vboxmanage storageattach "$VM_NAME" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "$VM_DIR/$VM_NAME.vdi"
+    $VBOXMANAGE storagectl "$VM_NAME" --name "SATA Controller" --add sata --controller IntelAhci
+    $VBOXMANAGE storageattach "$VM_NAME" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "$VM_DIR/$VM_NAME.vdi"
     check_command "Disk attachment failed."
 
-    vboxmanage storagectl "$VM_NAME" --name "IDE Controller" --add ide
-    vboxmanage storageattach "$VM_NAME" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$DOWNLOAD_DIR/$ISO_NAME"
+    $VBOXMANAGE storagectl "$VM_NAME" --name "IDE Controller" --add ide
+    $VBOXMANAGE storageattach "$VM_NAME" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$DOWNLOAD_DIR/$ISO_NAME"
     check_command "ISO file attachment failed."
   fi
 }
@@ -120,7 +122,7 @@ setup_vm() {
 get_guest_additions_iso() {
   # Get the VirtualBox version
   local vb_version
-  vb_version=$(vboxmanage --version | cut -d '_' -f 1)
+  vb_version=$($VBOXMANAGE --version | cut -d '_' -f 1)
   check_command "Failed to retrieve VirtualBox version."
 
   # Set download URL
@@ -139,7 +141,7 @@ get_guest_additions_iso() {
 
   # Attach the ISO to the VM
   print_message "green" "Attaching Guest Additions ISO"
-  vboxmanage storageattach "$VM_NAME" \
+  $VBOXMANAGE storageattach "$VM_NAME" \
     --storagectl "IDE Controller" \
     --port 1 --device 0 \
     --type dvddrive \
@@ -153,7 +155,7 @@ start_vm() {
   read -p "[?] Do you want to start the virtual machine now? (Y/n): " user_input
   if [[ "$user_input" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     print_message "green" "Starting the virtual machine"
-    vboxmanage startvm "$VM_NAME" --type gui
+    $VBOXMANAGE startvm "$VM_NAME" --type gui
     check_command "VM start failed."
 
     print_message "green" "Virtual machine started successfully!"
