@@ -14,7 +14,17 @@ After installing Ubuntu in the virtual machine:
 
 > [!WARNING]
 > OSs supported by the `create_vm.sh` script are Ubuntu like distros and openSUSE.
-> If you want to add your OS, edit the `download_virtual_box` function and add the corresponding `elif then` block 😊
+> If you want to add your OS, edit the `download_virtual_box()` function and add the corresponding `elif then` block 😊
+
+
+VM setup:
+- hard disk: 60 GB
+- RAM: 8 GB
+- CPUs: 6
+- VRAM: 128 MB
+- Network: NAT
+
+If you want to modify VM specs, edit the `setup_vm()` function.
 
 ## Setting up environment
 Each folder contains the script to set up the virtual machine in order to exploit the vulnerability and the PoC written in Rust. 
