@@ -107,7 +107,8 @@ setup_vm() {
     $VBOXMANAGE modifyvm "$VM_NAME" \
       --memory 8192 \
       --cpus 6 \
-      --nic1 nat \
+      --nic1 bridged \
+      --bridgeadapter1 "$(ip -o link show | awk -F': ' '{print $2}' | grep -m 1 -E 'en|eth|wlan')" \
       --boot1 dvd \
       --vrde on \
       --graphicscontroller vmsvga \

@@ -22,7 +22,7 @@ VM setup:
 - RAM: 8 GB
 - CPUs: 6
 - VRAM: 128 MB
-- Network: NAT
+- Network: bridge
 
 If you want to modify VM specs, edit the `setup_vm()` function.
 
